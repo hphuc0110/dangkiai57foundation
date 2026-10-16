@@ -1,21 +1,33 @@
-import { COURSE, isCustomSchedule, selectedScheduleText } from "../data/course";
+import { COURSE, isCustomSchedule, registrantTypeLabel, selectedScheduleText } from "../data/course";
 
 export function SummaryCard({ values }) {
+  const isSchool = values.registrantType === "school";
   const rows = [
+    { label: "Hình thức", value: registrantTypeLabel(values.registrantType) || "Chưa chọn" },
+    ...(isSchool
+      ? [
+          { label: "Nhà trường", value: values.schoolName || "—" },
+          { label: "Số học sinh", value: values.studentCount || "—" },
+        ]
+      : []),
     { label: "Khoá học", value: COURSE.name },
     { label: "Thời lượng", value: COURSE.duration },
-    { label: "Hình thức", value: COURSE.format },
-    { label: "Khai giảng", value: COURSE.opening },
-    {
-      label: isCustomSchedule(values.schedule) ? "Giờ trống" : "Khung giờ",
-      value: selectedScheduleText(values) || "Chưa chọn",
-    },
+    { label: "Hình thức học", value: COURSE.format },
+    ...(COURSE.opening ? [{ label: "Khai giảng", value: COURSE.opening }] : []),
+    ...(!isSchool
+      ? [
+          {
+            label: isCustomSchedule(values.schedule) ? "Giờ trống" : "Khung giờ",
+            value: selectedScheduleText(values) || "Chưa chọn",
+          },
+        ]
+      : []),
   ];
 
   return (
     <section className="summary" aria-label="Tóm tắt đăng ký">
       <h2>Tóm tắt</h2>
-      <p>Thông tin lớp học của em</p>
+      <p>{isSchool ? "Thông tin đăng ký của nhà trường" : "Thông tin lớp học của em"}</p>
       <div className="summary__rows">
         {rows.map((row) => (
           <div className="summary__row" key={row.label}>

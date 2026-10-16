@@ -4,6 +4,7 @@ import {
   COURSE,
   formatAvailability,
   isCustomSchedule,
+  registrantTypeLabel,
   scheduleLabel,
 } from "../data/course";
 
@@ -12,20 +13,55 @@ function cleanPhone(value) {
 }
 
 export function buildPayload(values) {
-  return {
+  const isSchool = values.registrantType === "school";
+  const base = {
     course: COURSE.fullName,
+    registrantType: registrantTypeLabel(values.registrantType),
+    referralCode: values.referralCode.trim(),
+    schedule: isSchool ? "" : scheduleLabel(values.schedule),
+    availability:
+      !isSchool && isCustomSchedule(values.schedule)
+        ? formatAvailability(values.freeDays, values.freeTimeStart, values.freeTimeEnd)
+        : "",
+    confirm: isSchool
+      ? "Trường xác nhận đăng ký tham gia khoá học 10 buổi nền tảng AI Foundation"
+      : CONFIRM_OPTION.label,
+  };
+
+  if (isSchool) {
+    return {
+      ...base,
+      schoolName: values.schoolName.trim(),
+      schoolAddress: values.schoolAddress.trim(),
+      contactName: values.contactName.trim(),
+      contactRole: values.contactRole.trim(),
+      contactPhone: cleanPhone(values.contactPhone),
+      contactEmail: values.contactEmail.trim(),
+      studentCount: String(values.studentCount).trim(),
+      studentName: "",
+      studentPhone: "",
+      school: values.schoolName.trim(),
+      className: "",
+      parentName: values.contactName.trim(),
+      parentPhone: cleanPhone(values.contactPhone),
+    };
+  }
+
+  return {
+    ...base,
     studentName: values.studentName.trim(),
     studentPhone: cleanPhone(values.studentPhone),
     school: values.school.trim(),
     className: values.className.trim(),
     parentName: values.parentName.trim(),
     parentPhone: cleanPhone(values.parentPhone),
-    referralCode: values.referralCode.trim(),
-    schedule: scheduleLabel(values.schedule),
-    availability: isCustomSchedule(values.schedule)
-      ? formatAvailability(values.freeDays, values.freeTimeStart, values.freeTimeEnd)
-      : "",
-    confirm: CONFIRM_OPTION.label,
+    schoolName: "",
+    schoolAddress: "",
+    contactName: "",
+    contactRole: "",
+    contactPhone: "",
+    contactEmail: "",
+    studentCount: "",
   };
 }
 

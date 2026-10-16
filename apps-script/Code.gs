@@ -23,12 +23,20 @@ var SHEET_NAME = "DangKy";
 var HEADERS = [
   "Thời gian gửi",
   "Khoá học",
+  "Loại đăng ký",
   "Họ và tên học sinh",
   "Số điện thoại học sinh",
   "Trường đang theo học",
   "Lớp học hiện tại",
   "Họ và tên phụ huynh",
   "Số điện thoại phụ huynh",
+  "Tên nhà trường",
+  "Địa chỉ trường",
+  "Người đại diện",
+  "Chức vụ",
+  "SĐT liên hệ (trường)",
+  "Email liên hệ",
+  "Số lượng học sinh",
   "Mã giới thiệu",
   "Khung giờ học",
   "Lịch học trống",
@@ -101,7 +109,15 @@ function doPost(e) {
 
   try {
     var data = parseBody_(e);
-    if (!data.studentName) {
+    var isSchool = String(data.registrantType || "") === "Nhà trường";
+    if (isSchool) {
+      if (!data.schoolName && !data.school) {
+        return json_({ ok: false, error: "Thiếu tên nhà trường." });
+      }
+      if (!data.contactName && !data.parentName) {
+        return json_({ ok: false, error: "Thiếu người đại diện." });
+      }
+    } else if (!data.studentName) {
       return json_({ ok: false, error: "Thiếu họ và tên học sinh." });
     }
 
@@ -110,12 +126,20 @@ function doPost(e) {
     var record = {};
     record["Thời gian gửi"] = sentAt;
     record["Khoá học"] = plain_(data.course, 120);
+    record["Loại đăng ký"] = plain_(data.registrantType || "Cá nhân", 40);
     record["Họ và tên học sinh"] = plain_(data.studentName, 80);
     record["Số điện thoại học sinh"] = plain_(data.studentPhone, 20);
     record["Trường đang theo học"] = plain_(data.school, 120);
     record["Lớp học hiện tại"] = plain_(data.className, 40);
     record["Họ và tên phụ huynh"] = plain_(data.parentName, 80);
     record["Số điện thoại phụ huynh"] = plain_(data.parentPhone, 20);
+    record["Tên nhà trường"] = plain_(data.schoolName, 120);
+    record["Địa chỉ trường"] = plain_(data.schoolAddress, 200);
+    record["Người đại diện"] = plain_(data.contactName, 80);
+    record["Chức vụ"] = plain_(data.contactRole, 80);
+    record["SĐT liên hệ (trường)"] = plain_(data.contactPhone, 20);
+    record["Email liên hệ"] = plain_(data.contactEmail, 120);
+    record["Số lượng học sinh"] = plain_(data.studentCount, 20);
     record["Mã giới thiệu"] = plain_(data.referralCode, 40);
     record["Khung giờ học"] = plain_(data.schedule, 160);
     record["Lịch học trống"] = plain_(data.availability, 200);
@@ -156,6 +180,7 @@ function submitSample() {
     postData: {
       contents: JSON.stringify({
         course: "Lớp Nền tảng AI Foundation",
+        registrantType: "Cá nhân",
         studentName: "Học sinh thử",
         studentPhone: "0912345678",
         school: "THPT Thử",

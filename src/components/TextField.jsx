@@ -10,6 +10,8 @@ export function TextField({
   inputMode,
   autoComplete,
   maxLength,
+  min,
+  max,
 }) {
   const id = `field-${name}`;
   const errorId = `${id}-error`;
@@ -27,6 +29,8 @@ export function TextField({
         inputMode={inputMode}
         autoComplete={autoComplete}
         maxLength={maxLength}
+        min={min}
+        max={max}
         placeholder={placeholder}
         value={value}
         aria-invalid={error ? "true" : undefined}

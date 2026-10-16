@@ -1,7 +1,7 @@
 import { PrimaryButton } from "./PrimaryButton";
 import { TextField } from "./TextField";
 
-export function StudentStep({ values, errors, onChange, onNext }) {
+export function StudentStep({ values, errors, onChange, onNext, onChangeType }) {
   return (
     <form
       className="form"
@@ -11,6 +11,15 @@ export function StudentStep({ values, errors, onChange, onNext }) {
       }}
       noValidate
     >
+      <div className="form-type-bar">
+        <p>
+          Hình thức: <strong>Cá nhân</strong>
+        </p>
+        <button className="link-btn" type="button" onClick={onChangeType}>
+          Đổi hình thức
+        </button>
+      </div>
+
       <h2 className="section-title">Học sinh</h2>
       <div className="grid-2">
         <TextField
@@ -49,12 +58,12 @@ export function StudentStep({ values, errors, onChange, onNext }) {
           required
         />
         <TextField
-          label="Lớp học hiện tại"
+          label="Năm sinh"
           name="className"
           value={values.className}
           onChange={onChange}
           error={errors.className}
-          placeholder="Ví dụ: 10A1"
+          placeholder="Ví dụ: 2008"
           autoComplete="off"
           maxLength={40}
           required

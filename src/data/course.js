@@ -11,11 +11,28 @@ export const COURSE = {
   hotlineTel: "0996963399",
 };
 
-export const STEPS = [
+export const STEPS_PERSONAL = [
   { id: "info", label: "Thông tin học sinh & phụ huynh", short: "Thông tin" },
   { id: "schedule", label: "Đăng ký lịch học", short: "Lịch học" },
   { id: "submit", label: "Xác nhận và gửi", short: "Xác nhận" },
 ];
+
+export const STEPS_SCHOOL = [
+  { id: "info", label: "Thông tin nhà trường", short: "Thông tin" },
+  { id: "submit", label: "Xác nhận và gửi", short: "Xác nhận" },
+];
+
+export const STEPS = STEPS_PERSONAL;
+
+export function getSteps(registrantType) {
+  return registrantType === "school" ? STEPS_SCHOOL : STEPS_PERSONAL;
+}
+
+export function registrantTypeLabel(type) {
+  if (type === "school") return "Nhà trường";
+  if (type === "personal") return "Cá nhân";
+  return "";
+}
 
 export const CUSTOM_SCHEDULE = "custom";
 
