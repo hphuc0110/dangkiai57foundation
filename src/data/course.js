@@ -67,7 +67,7 @@ export function formatAvailability(days, start, end) {
 export const CONFIRM_OPTION = {
   value: "yes",
   label:
-    "Em xác nhận tham gia khoá học 10 buổi nền tảng AI Foundation (khai giảng thứ 7 ngày 17/10)",
+    "Em xác nhận tham gia khoá học 10 buổi nền tảng AI Foundation ",
 };
 
 export function scheduleLabel(value) {
