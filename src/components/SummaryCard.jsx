@@ -7,7 +7,7 @@ export function SummaryCard({ values }) {
     ...(isSchool
       ? [
           { label: "Nhà trường", value: values.schoolName || "—" },
-          { label: "Số học sinh", value: values.studentCount || "—" },
+          { label: "Người đại diện", value: values.contactName || "—" },
         ]
       : []),
     { label: "Khoá học", value: COURSE.name },

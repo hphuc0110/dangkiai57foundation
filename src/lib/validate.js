@@ -14,7 +14,6 @@ export const INITIAL_VALUES = {
   contactRole: "",
   contactPhone: "",
   contactEmail: "",
-  studentCount: "",
   referralCode: "",
   schedule: "",
   freeDays: [],
@@ -53,7 +52,7 @@ function validatePersonalInfo(values, errors) {
   const studentPhone = phoneError(values.studentPhone, "Vui lòng nhập số điện thoại học sinh");
   if (studentPhone) errors.studentPhone = studentPhone;
   requireText(values, errors, "school", "Vui lòng nhập trường đang theo học");
-  requireText(values, errors, "className", "Vui lòng nhập lớp học hiện tại");
+  requireText(values, errors, "className", "Vui lòng nhập năm sinh");
 
   const parentName = String(values.parentName || "").trim();
   if (parentName.length < 2) errors.parentName = "Vui lòng nhập họ và tên phụ huynh";
@@ -64,13 +63,6 @@ function validatePersonalInfo(values, errors) {
 function validateSchoolInfo(values, errors) {
   requireText(values, errors, "schoolName", "Vui lòng nhập tên nhà trường");
   requireText(values, errors, "schoolAddress", "Vui lòng nhập địa chỉ trường");
-
-  const count = Number(values.studentCount);
-  if (!String(values.studentCount || "").trim()) {
-    errors.studentCount = "Vui lòng nhập số lượng học sinh";
-  } else if (!Number.isInteger(count) || count < 1) {
-    errors.studentCount = "Số lượng học sinh phải từ 1 trở lên";
-  }
 
   const contactName = String(values.contactName || "").trim();
   if (contactName.length < 2) errors.contactName = "Vui lòng nhập họ và tên người đại diện";

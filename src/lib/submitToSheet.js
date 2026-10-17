@@ -14,9 +14,12 @@ function cleanPhone(value) {
 
 export function buildPayload(values) {
   const isSchool = values.registrantType === "school";
+  const typeLabel = registrantTypeLabel(values.registrantType);
   const base = {
     course: COURSE.fullName,
-    registrantType: registrantTypeLabel(values.registrantType),
+    registrantType: typeLabel,
+    type: isSchool ? "school" : "personal",
+    registrantTypeLabel: typeLabel,
     referralCode: values.referralCode.trim(),
     schedule: isSchool ? "" : scheduleLabel(values.schedule),
     availability:
@@ -25,7 +28,7 @@ export function buildPayload(values) {
         : "",
     confirm: isSchool
       ? "Trường xác nhận đăng ký tham gia khoá học 10 buổi nền tảng AI Foundation"
-      : CONFIRM_OPTION.label,
+      : CONFIRM_OPTION.label.trim(),
   };
 
   if (isSchool) {
@@ -37,13 +40,6 @@ export function buildPayload(values) {
       contactRole: values.contactRole.trim(),
       contactPhone: cleanPhone(values.contactPhone),
       contactEmail: values.contactEmail.trim(),
-      studentCount: String(values.studentCount).trim(),
-      studentName: "",
-      studentPhone: "",
-      school: values.schoolName.trim(),
-      className: "",
-      parentName: values.contactName.trim(),
-      parentPhone: cleanPhone(values.contactPhone),
     };
   }
 
@@ -55,14 +51,17 @@ export function buildPayload(values) {
     className: values.className.trim(),
     parentName: values.parentName.trim(),
     parentPhone: cleanPhone(values.parentPhone),
-    schoolName: "",
-    schoolAddress: "",
-    contactName: "",
-    contactRole: "",
-    contactPhone: "",
-    contactEmail: "",
-    studentCount: "",
   };
+}
+
+async function readEndpointInfo(url) {
+  try {
+    const res = await fetch(url, { method: "GET", redirect: "follow" });
+    const text = await res.text();
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 export async function submitToSheet(values) {
@@ -73,13 +72,21 @@ export async function submitToSheet(values) {
     );
   }
 
+  const info = await readEndpointInfo(url);
+  if (!info?.version || info.version !== "split-sheets-v2") {
+    throw new Error(
+      "URL trong src/config.js chưa trỏ tới bản split-sheets-v2. Mở đúng deployment mới trên trình duyệt (thấy version split-sheets-v2), copy URL /exec đó dán vào src/config.js rồi lưu lại.",
+    );
+  }
+
+  const payload = buildPayload(values);
   let response;
   try {
     response = await fetch(url, {
       method: "POST",
       redirect: "follow",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(buildPayload(values)),
+      body: JSON.stringify(payload),
     });
   } catch {
     throw new Error("Không kết nối được Google Sheet. Kiểm tra mạng hoặc link Apps Script.");
@@ -94,7 +101,9 @@ export async function submitToSheet(values) {
   }
 
   if (!response.ok || data?.ok === false) {
-    throw new Error(data?.error || "Google Sheet từ chối đăng ký. Kiểm tra lại Apps Script rồi deploy phiên bản mới.");
+    throw new Error(
+      data?.error || "Google Sheet từ chối đăng ký. Kiểm tra lại Apps Script rồi deploy phiên bản mới.",
+    );
   }
 
   return data ?? { ok: true };
